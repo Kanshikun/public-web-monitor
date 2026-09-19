@@ -1,6 +1,6 @@
 # Public web monitor
 
-公開Webの入口を、PCを起動していなくてもGitHub Actionsで確認するための[公開リポジトリ](https://github.com/Kanshikun/public-web-monitor)です。15分間隔のスケジュールを導入済みです。2026-09-19の[初回手動実行](https://github.com/Kanshikun/public-web-monitor/actions/runs/35432330050)で、アニメイランクとStar HuntがGitHub runnerからHTTP 200・内容一致で成功しました。通知の本人への到達は未確認です。
+公開Webの入口を、PCを起動していなくてもGitHub Actionsで確認するための[公開リポジトリ](https://github.com/Kanshikun/public-web-monitor)です。15分間隔のスケジュールを導入済みです。2026-09-19の[通常手動実行](https://github.com/Kanshikun/public-web-monitor/actions/runs/35432420276)で、下記3サイトすべてがGitHub runnerからHTTP 200・内容一致で成功しました（08:35:51～53 UTC、各1試行）。通知の本人への到達は未確認です。
 
 | 監視先 | 期待する応答 |
 | --- | --- |
