@@ -71,3 +71,10 @@ python3 monitor.py --simulate-failure
 上記は専用Issue導入前のActions標準通知の実績である。専用Issueによる障害・復旧通知はコードと架空API応答テストを追加した段階で、実際のworkflowと通知到達の検証結果は別途追記する。
 
 workflowはactive、cron定義は保存済み。ここまでの実行証跡は手動実行であり、最初のschedule実行を観測した証拠とは区別する。
+
+
+## 障害・復旧Issueの実到達確認
+
+2026-09-19、[模擬障害run35433536604](https://github.com/Kanshikun/public-web-monitor/actions/runs/35433536604)で[専用Issue #1](https://github.com/Kanshikun/public-web-monitor/issues/1)を作成し、所有者のGitHub通知欄にassign通知が届いたことをAPIで確認した。この障害は通知試験で、サイト障害ではない。
+
+[通常復帰run35433560287](https://github.com/Kanshikun/public-web-monitor/actions/runs/35433560287)は3サイトの検査が成功し、同じIssueへRECOVEREDコメントを1件追加してcloseした。通知欄も復旧イベント後に更新されたことを確認した。Issueは現在closed。メール到達・本人の既読は未確認である。ローカルとGitHub runnerの21テストも成功している。
