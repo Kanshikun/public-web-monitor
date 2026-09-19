@@ -12,6 +12,8 @@ import time
 import urllib.error
 import urllib.request
 
+from github_issues import NotificationError, sync_incident
+
 TIMEOUT_SECONDS = 10
 MAX_BODY = 256 * 1024
 RETRY_SECONDS = 5
@@ -99,13 +101,13 @@ def check_target(target):
         time.sleep(RETRY_SECONDS)
 
 
-def write_summary(results, *, simulated=False):
+def write_summary(results, *, simulated=False, notification=None):
     location = os.environ.get("GITHUB_STEP_SUMMARY")
     if not location:
         return
     lines = ["## Public web monitor", "", f"UTC: {utc_now()}", ""]
     if simulated:
-        lines.append("**FAIL — SIMULATED_FAILURE** (manual notification test; no network requests)")
+        lines.append("**FAIL — SIMULATED_FAILURE** (manual notification test; no monitored-site requests)")
     else:
         lines.extend(["| Target | Result | HTTP | Category | Attempts | Checked at (UTC) |",
                       "| --- | --- | --- | --- | --- | --- |"])
@@ -114,23 +116,34 @@ def write_summary(results, *, simulated=False):
                          f"{result.status if result.status is not None else 'none'} | "
                          f"{result.category} | {result.attempts} | {result.checked_at} |")
         lines.extend(["", "Checks cover public landing pages only; application functions were not tested."])
+    if notification is not None:
+        lines.extend(["", "GitHub issue notification: " + notification])
     with Path(location).open("a", encoding="utf-8") as handle:
         handle.write("\n".join(lines) + "\n")
 
 
 def main(argv=None):
     args = sys.argv[1:] if argv is None else argv
-    if args not in ([], ["--simulate-failure"]):
+    if len(args) != len(set(args)) or any(arg not in ("--simulate-failure", "--github-issues") for arg in args):
         print("FAIL monitor INVALID_ARGUMENT")
         return 2
     try:
-        if args == ["--simulate-failure"]:
+        simulated = "--simulate-failure" in args
+        if simulated:
             print(f"FAIL monitor SIMULATED_FAILURE utc={utc_now()}")
-            write_summary([], simulated=True)
-            return 1
-        results = [check_target(target) for target in TARGETS]
-        write_summary(results)
-        return 0 if all(result.passed for result in results) else 1
+        results = [] if simulated else [check_target(target) for target in TARGETS]
+        healthy = not simulated and all(result.passed for result in results)
+        notification = None
+        if "--github-issues" in args:
+            try:
+                notification = sync_incident(healthy)
+            except NotificationError:
+                print("FAIL monitor ISSUE_NOTIFICATION_FAILED")
+                write_summary(results, simulated=simulated, notification="FAILED")
+                return 1
+            print("NOTICE monitor " + notification)
+        write_summary(results, simulated=simulated, notification=notification)
+        return 0 if healthy else 1
     except KeyboardInterrupt:
         print("FAIL monitor INTERRUPTED")
         return 130

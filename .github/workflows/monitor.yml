@@ -6,13 +6,14 @@ on:
   workflow_dispatch:
     inputs:
       simulate_failure:
-        description: '通知導線の失敗テスト（通信なし）'
+        description: '障害Issue通知テスト（監視サイトへの通信なし）'
         required: false
         type: boolean
         default: false
 
 permissions:
   contents: read
+  issues: write
 
 concurrency:
   group: public-web-monitor
@@ -31,10 +32,11 @@ jobs:
         run: python3 -m unittest discover -s tests -v
       - name: Check public pages
         env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SIMULATE_FAILURE: ${{ github.event_name == 'workflow_dispatch' && inputs.simulate_failure && 'true' || 'false' }}
         run: |
           if [ "$SIMULATE_FAILURE" = "true" ]; then
-            python3 monitor.py --simulate-failure
+            python3 monitor.py --simulate-failure --github-issues
           else
-            python3 monitor.py
+            python3 monitor.py --github-issues
           fi
