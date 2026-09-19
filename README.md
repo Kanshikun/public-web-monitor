@@ -1,6 +1,6 @@
 # Public web monitor
 
-公開Webの入口を、PCを起動していなくてもGitHub Actionsで確認するための[公開リポジトリ](https://github.com/Kanshikun/public-web-monitor)です。15分間隔のスケジュールを導入済みです。2026-09-19の[通常手動実行](https://github.com/Kanshikun/public-web-monitor/actions/runs/35432420276)で、下記3サイトすべてがGitHub runnerからHTTP 200・内容一致で成功しました（08:35:51～53 UTC、各1試行）。通知の本人への到達は未確認です。
+公開Webの入口を、PCを起動していなくてもGitHub Actionsで確認するための[公開リポジトリ](https://github.com/Kanshikun/public-web-monitor)です。15分間隔のスケジュールを導入済みです。2026-09-19の[通常手動実行](https://github.com/Kanshikun/public-web-monitor/actions/runs/35432420276)で、下記3サイトすべてがGitHub runnerからHTTP 200・内容一致で成功しました（08:35:51～53 UTC、各1試行）。模擬異常のGitHub Web通知欄への到達も確認しました。本人の既読・メール到達・復旧通知は未確認です。
 
 | 監視先 | 期待する応答 |
 | --- | --- |
@@ -45,3 +45,10 @@ python3 monitor.py --simulate-failure
 2行目は実サイトへの確認、3行目は通信なしの意図的失敗です。`GITHUB_STEP_SUMMARY`がないローカル実行ではファイルを作成しません。対象追加や期待文字列の変更は、allowlistとテストをレビューしてから反映します。
 
 この監視が確認するのは公開入口の応答だけです。Googleログイン、APIキーの有効性、DB保存、バックアップ復元、メール送信は別の検証として管理します。
+
+
+## 2026-09-19の通知試験
+
+[模擬失敗 run 35432517749](https://github.com/Kanshikun/public-web-monitor/actions/runs/35432517749)の後、所有者のGitHub通知APIでこのrepoの `ci_activity` と失敗通知タイトルを確認した。通常設定へ戻した[run 35432580821](https://github.com/Kanshikun/public-web-monitor/actions/runs/35432580821)は成功。復旧通知の到達は確認できていない。
+
+workflowはactive、cron定義は保存済み。ここまでの実行証跡は手動実行であり、最初のschedule実行を観測した証拠とは区別する。
