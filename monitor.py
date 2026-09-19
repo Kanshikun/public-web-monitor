@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Unauthenticated checks for two fixed public landing pages; stdlib only."""
+"""Unauthenticated checks for fixed public landing pages; stdlib only."""
 
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -28,6 +28,7 @@ class Target:
 TARGETS = (
     Target("animeirank", "https://animeirank.com/auth/login", 200, "アニメイランク"),
     Target("star-hunt", "https://star-hunt-v2.gattsu01.chatgpt.site/", 200, "Star Hunt"),
+    Target("public-app-directory", "https://public-app-directory.gattsu01.chatgpt.site/", 200, "公開アプリ一覧"),
 )
 
 

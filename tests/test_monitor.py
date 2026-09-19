@@ -45,6 +45,7 @@ class MonitorTests(unittest.TestCase):
         self.assertIsNone(request.data)
         self.assertIsNone(request.get_header("Authorization"))
         self.assertIsNone(request.get_header("Cookie"))
+        self.assertEqual(request.get_header("User-agent"), "public-web-monitor/1")
         self.assertEqual(opened.call_args.kwargs["timeout"], 10)
         self.assertEqual(built.call_args.args[0].proxies, {})
 
@@ -118,18 +119,21 @@ class MonitorTests(unittest.TestCase):
             self.assertIn("SIMULATED_FAILURE", summary.read_text())
             self.assertRegex(summary.read_text(), r"UTC: \d{4}-\d\d-\d\dT\d\d:\d\d:\d\dZ")
 
-    def test_both_targets_checked_summary_written_and_one_failure_fails_job(self):
-        outcomes = [monitor.Result(TARGET.id, False, 503, "STATUS_MISMATCH", 2, "2026-09-19T00:00:00Z"),
-                    monitor.Result(monitor.TARGETS[1].id, True, 200, "MATCH", 1, "2026-09-19T00:00:05Z")]
+    def test_all_targets_checked_summary_written_and_one_failure_fails_job(self):
+        outcomes = [monitor.Result(target.id, index > 0, 200 if index else 503,
+                                   "MATCH" if index else "STATUS_MISMATCH", 1 if index else 2,
+                                   "2026-09-19T00:00:00Z")
+                    for index, target in enumerate(monitor.TARGETS)]
         with tempfile.TemporaryDirectory() as directory:
             summary = Path(directory) / "summary.md"
             with patch.dict(os.environ, {"GITHUB_STEP_SUMMARY": str(summary)}):
                 with patch.object(monitor, "check_target", side_effect=outcomes) as checked:
                     self.assertEqual(monitor.main([]), 1)
-            self.assertEqual(checked.call_count, 2)
+            self.assertEqual(checked.call_count, len(monitor.TARGETS))
             content = summary.read_text()
             self.assertIn("| animeirank | FAIL | 503", content)
             self.assertIn("| star-hunt | PASS | 200", content)
+            self.assertIn("| public-app-directory | PASS | 200", content)
             self.assertNotIn(CANARY, content)
 
     def test_invalid_cli_arguments_never_echo_input(self):
