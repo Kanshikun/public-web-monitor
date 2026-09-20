@@ -78,3 +78,7 @@ workflowはactive、cron定義は保存済み。ここまでの実行証跡は�
 2026-09-19、[模擬障害run35433536604](https://github.com/Kanshikun/public-web-monitor/actions/runs/35433536604)で[専用Issue #1](https://github.com/Kanshikun/public-web-monitor/issues/1)を作成し、所有者のGitHub通知欄にassign通知が届いたことをAPIで確認した。この障害は通知試験で、サイト障害ではない。
 
 [通常復帰run35433560287](https://github.com/Kanshikun/public-web-monitor/actions/runs/35433560287)は3サイトの検査が成功し、同じIssueへRECOVEREDコメントを1件追加してcloseした。通知欄も復旧イベント後に更新されたことを確認した。Issueは現在closed。メール到達・本人の既読は未確認である。ローカルとGitHub runnerの21テストも成功している。
+
+## 2026-09-20の監視補完
+
+scheduleの実測間隔が2時間超だったため、主たるHTTP監視としてUptimeRobot Freeを追加した。既存3サイトを5分間隔・メール通知ありで登録し、全件Upと所有者のテストメール受信を確認済み。このGitHub監視は本文一致検査と専用Issue通知の補助として継続する。UptimeRobotの受信確認をGitHub通知メールの確認済みという意味には置き換えない。
